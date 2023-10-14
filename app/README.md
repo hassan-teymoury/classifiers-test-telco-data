@@ -105,9 +105,9 @@ As run the `python_task_telco.py` with custom arguments, you can see the visuali
 
 ## Compare performance results for different algorithms for a default setting
 
-| Classifier | Accuracy    | Recall on class 1    | Recall on class 0    |
+| Classifier | Accuracy    | Recall on class 0    | Recall on class 1    |
 | :---:      | :---: | :---: | :---: |
-| XGBoost Classifier    | 301   | 283   |20000 |
-| Logistic Regression    | 301   | 283   |20000 |
-| sd    | 301   | 283   |2000 |
-| Seconds    | 301   | 283   |2000 |
+| XGBoost Classifier    | 0.79   | 0.92   |0.42 |
+| SGD classifier    | 0.78   | 0.89   |0.45 |
+| Logistic Regression    | 0.78   | 0.9   |0.45 |
+| RandomForest Classifier    | 0.79   | 0.93   |0.4 |
