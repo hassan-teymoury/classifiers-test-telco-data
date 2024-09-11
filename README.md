@@ -92,15 +92,15 @@ As run the `python_task_telco.py` with custom arguments, you can see the visuali
 
 
 ### __Confusion Matrix Example__
-![Alt text](evaluation_results/confusion_matrix.png)
+![Alt text](app/evaluation_results/confusion_matrix.png)
 
 
 ### __Precision-Recall Example__
-![Alt text](evaluation_results/precision_recall.png)  
+![Alt text](app/evaluation_results/precision_recall.png)  
 
 
 ### __Recall On Class Example__
-![Alt text](evaluation_results/roc.png)
+![Alt text](app/evaluation_results/roc.png)
 
 
 ## Compare performance results for different algorithms for a default setting
