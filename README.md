@@ -1,82 +1,113 @@
 
-# Python Developer AI  Task
+# Customized Classifier for Telco customer churn dataset
 
-Build a binary classification model to predict whether a customer will churn (i.e., discontinue their subscription) or not based on various features in the dataset. You are given a dataset containing customer information and whether they churned or not in the past. Your task is to use this dataset to train a machine learning model and evaluate its performance on a test set.
+## Get started
 
-Dataset: You can use the Telco Customer Churn dataset, which is available on Kaggle at https://www.kaggle.com/blastchar/telco-customer-churn.
+1. Clone the repository:
 
-## Practices and patterns (Must):
+    ```cmd
+    git clone https://github.com/hassan-teymoury/python-ai-developer.git
+    ```
 
-- [TDD](https://en.wikipedia.org/wiki/Test-driven_development): A) Processes Data Clean Up B) Train C) Performance Test
-- [DDD](https://en.wikipedia.org/wiki/Domain-driven_design): Adjust Relevant Domain
-- Clean Architecture
-- Clean Code
-- Clean git commits that shows your work progress.
+2. Go to `app` directory:
 
-## Deliverables:
+    ```cmd
+    cd app
+    ```
 
-1. Python script that reads in the dataset, preprocesses it, trains a model, and evaluates its performance on a test set.
-2. A report explaining your approach, including details on data preprocessing, feature selection/engineering, choice of algorithm, hyperparameter tuning, and evaluation metrics.
-3. A visual representation of your model's performance (e.g., ROC curve, confusion matrix).
-4. Please clone this repository in a new github repository in private mode and share with ID: `mason-chase` in private mode on github.com, make sure you do not erase my commits and then create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) (code review).
+3. Run `python_task_telco.py` code with specified arguments:
 
-## Requirements:
+    ```cmd
+    python3 python_task_telco.py --datapath=data/WA_Fn-UseC_-Telco-Customer-Churn.csv --topk_features=10 --test_size=0.2 --scaler_type=minmax_scaler --scale_axis=1 --classifier=sgd_classifier
+    ```
 
-Use Python 3.x.
-1. Use scikit-learn for the machine learning tasks.
-2. Your code should be well-documented and follow best practices for software engineering.
-3. Your report should be clear and concise, with appropriate visualizations to support your claims.
-4. Your model should achieve an accuracy of at least 75% on the test set.
+## Code Architecture
+
+This code has two main blocks (better to say __objects__):
+
+1. Data Preprocessing Object
+
+    Includes following operections to prepapre and preprocess data for training:
+    
+    1. Loading data from a .csv dataframe using __`--datapath`__ argument
+
+    2. Converting the categorical features into numerical descrete space
+    
+    3. Feature selection to get best features for classifier training using __`--topk_features`__ 
+    argument. Default value for this parameter is set to 7. I've used 
+    __`mutual_info_classif`__ as a feature selection tool represented by __`scikit-learn`__. However, 
+    we can use other approaches such as __correlation representation__ to get linear relationship 
+    between features in our entire dataset 
+
+    4. Scaling (normalizing) the data based on scaler type and scaler axis (that means scaling on 
+    samples or features) using __`--scaler_type`__ and scaler_type __`--scale_axis`__ arguments.
+       
+        Available scaler types based on __sklearn package__: 
+
+        __[default_scaler, minmax_scaler, robust_scaler, maxabs_scaler]__
+
+        Set scale axis to __1__ for __feature based__ scaling and __0__ for __sample based__ scaling
+
+    5. Splitting data into test and traing sets to get evaluation of the model on unseen data using 
+     __`--test_size`__ argument. A value of 0.2 is recommended
 
 
-## Test Driven
+2. Classifier Object:
 
-Please improve below test model with clean architecture
+    This object allows you to choose a classifier using __`--classifier`__ argument and Includes 
+    following classifiers for train and test on dataset:
 
-```python
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-import unittest
+    1. __`xgb`__ or XGBoost classifier that use boosted decision trees for training. This algorithm 
+     uses multiple classifiers in a sequence format in a way that could pass the results of previous   
+    classifier to the next one in weight optimization process 
 
-class TestModel(unittest.TestCase):
+    2. __`logistic_regression`__ or Logistic Regression classifier that works based on a single neuron 
+    learning with considering an activation function to get output and create gradients for 
+    optimization process.
 
-    def setUp(self):
-        # Load the data from a CSV file
-        self.data = pd.read_csv('data.csv')
-        
-        # Split the data into features and labels
-        self.X = self.data.drop('target', axis=1)
-        self.y = self.data['target']
-        
-        # Split the data into training and testing sets
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
-        
-        # Preprocess the data by scaling the features
-        self.scaler = StandardScaler()
-        self.X_train = self.scaler.fit_transform(self.X_train)
-        self.X_test = self.scaler.transform(self.X_test)
-        
-        # Train the logistic regression model
-        self.model = LogisticRegression()
-        self.model.fit(self.X_train, self.y_train)
-        
-        # Test the model on the test set
-        self.y_pred = self.model.predict(self.X_test)
-        
-    def test_accuracy(self):
-        # Assert
-        expected_accuracy = 0.9
-        actual_accuracy = accuracy_score(self.y_test, self.y_pred)
-        self.assertAlmostEqual(actual_accuracy, expected_accuracy, delta=0.05)
+    3. __`sgd_classifier`__ or SGDClassifier that works similar to Logistic Regression. The main   
+    difference is due to learning process. Here SGDClassifier uses a learning rate parameter to 
+    optimize weights for learning.
 
-    def test_model_has_coefs(self):
-        # Assert
-        self.assertIsNotNone(self.model.coef_)
+    4. __`random_forest`__ or RandomForestClassifier that is similar to XGBoost classifier with 
+    parallel processing on classifiers results for optimization. That means, here we have some 
+    processors that could pass result of each classifier to another in a parallel format
 
-if __name__ == '__main__':
-    unittest.main()
-```
+    The classifier object in source code has two main parts:
 
+    1. __Fitting (Training) selected classifier to training data__
+
+    2. __Evaluation (Testing) selected classifier on test data that splitted before__
+
+    As you run the __`python_task_telco.py`__ code with your desired arguments, at the first stage,
+    data would be processed and then passed to __Classifier Object__. in Classifier object, at the 
+    beginning, the selected algorithm would be fitted to training data and at the second step the 
+    performance results would be visualized
+
+
+## Evaluate the custom classifier on test data:
+
+As run the `python_task_telco.py` with custom arguments, you can see the visualized evaluation metrics such as precision recall curve, ROC curve and Confusion matrix:
+
+
+
+### __Confusion Matrix Example__
+![Alt text](evaluation_results/confusion_matrix.png)
+
+
+### __Precision-Recall Example__
+![Alt text](evaluation_results/precision_recall.png)  
+
+
+### __Recall On Class Example__
+![Alt text](evaluation_results/roc.png)
+
+
+## Compare performance results for different algorithms for a default setting
+
+| Classifier | Accuracy    | Recall on class 0    | Recall on class 1    |
+| :---:      | :---: | :---: | :---: |
+| XGBoost Classifier    | 0.79   | 0.92   |0.42 |
+| SGD classifier    | 0.78   | 0.89   |0.45 |
+| Logistic Regression    | 0.78   | 0.9   |0.45 |
+| RandomForest Classifier    | 0.79   | 0.93   |0.4 |
